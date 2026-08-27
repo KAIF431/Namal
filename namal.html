@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Namal — Literary Experience</title>
+
+    <!-- OpenGraph & Social Media Sharing Preview Cards -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Namal— Literary Experience">
+    <meta property="og:description" content="A profound Urdu digital novel unraveling the deep mysteries of faith, identity, guidance, and spiritual transformation. Written by Nimra Ahmed.">
+    <meta property="og:image" content="Namal.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="Namal.css">
+    <script>
+        (function() {
+            var t = localStorage.getItem("selectedTheme") || localStorage.getItem("parda_theme") || "dark";
+            var f = localStorage.getItem("selectedFont") || localStorage.getItem("parda_font") || "literata";
+            var s = localStorage.getItem("selectedSize") || localStorage.getItem("parda_size") || "medium";
+            document.documentElement.setAttribute("data-theme", t);
+            document.documentElement.setAttribute("data-font", f);
+            document.documentElement.setAttribute("data-size", s);
+        })();
+
+        window.handleCommentSubmit = function(e) {
+            if (e) {
+                if (e.preventDefault) e.preventDefault();
+                if (e.stopPropagation) e.stopPropagation();
+            }
+            var nameInput = document.getElementById("reviewerName");
+            var emailInput = document.getElementById("reviewerEmail");
+            var messageInput = document.getElementById("reviewerMessage");
+            
+            var name = nameInput ? nameInput.value.trim() : "";
+            var email = emailInput ? emailInput.value.trim() : "";
+            var message = messageInput ? messageInput.value.trim() : "";
+
+            if (!name || !message) {
+                alert("Kripya apna Naam aur Message dono bharein!");
+                return false;
+            }
+
+            var newComment = { name: name, message: message, date: new Date().toLocaleDateString() };
+            
+            try {
+                var comments = JSON.parse(localStorage.getItem("parda_comments")) || [];
+                comments.push(newComment);
+                localStorage.setItem("parda_comments", JSON.stringify(comments));
+            } catch(err) {}
+
+            var commentsList = document.getElementById("commentsList");
+            if (commentsList) {
+                var commentDiv = document.createElement("div");
+                commentDiv.className = "comment-item";
+                commentDiv.style.cssText = "background: var(--bg-main); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; margin-top: 1rem;";
+                commentDiv.innerHTML = '<div class="comment-header" style="color: var(--accent-gold); margin-bottom: 0.5rem;"><strong>' + escapeHTML(name) + '</strong></div><p style="color: var(--text-primary); margin: 0; line-height: 1.6;">' + escapeHTML(message) + '</p>';
+                commentsList.prepend(commentDiv);
+            }
+
+            if (nameInput) nameInput.value = "";
+            if (emailInput) emailInput.value = "";
+            if (messageInput) messageInput.value = "";
+
+            try {
+                var formData = new FormData();
+                formData.append("access_key", "78b08615-65ca-4c89-a320-b21b236bba26");
+                formData.append("subject", "New Comment on Namal");
+                formData.append("name", name);
+                formData.append("email", email || "Not Provided");
+                formData.append("message", message);
+                fetch("https://api.web3forms.com/submit", { method: "POST", body: formData }).catch(function(){});
+            } catch(err) {}
+
+            alert("🎉 Aapka comment successfully post ho gaya hai!");
+            return false;
+        };
+
+        function escapeHTML(str) {
+            if (!str) return "";
+            return str.replace(/[&<>'"]/g, function(tag) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag;
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+<header class="site-header">
+    <a href="#home" class="logo">
+         <span>Namal</span>
+    </a>
+
+    <nav class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#about">Story</a>
+        <a href="#author">Author</a>
+        <a href="#characters">Characters</a>
+        <a href="#gallery">Moodboard</a>
+        <a href="#quotes">Quotes</a>
+        <a href="#community">Community</a>
+    </nav>
+
+    <div class="header-actions">
+        <button class="header-button audio-toggle-btn" onclick="toggleAmbient('calm', this)" title="Soft Calming Music">Sound</button>
+        <button class="header-button" id="contactButton" onclick="if(typeof openContact==='function'){openContact(event);}else{document.getElementById('contactModal').classList.add('active');document.getElementById('contactModal').style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100000;opacity:1!important;pointer-events:all!important;display:flex!important;align-items:center;justify-content:center;';document.getElementById('settingsOverlay').classList.add('active');document.getElementById('settingsOverlay').style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999998!important;opacity:1!important;pointer-events:all!important;';}">Contact Us</button>
+        <button class="header-button" id="chaptersButton" onclick="if(typeof openChapters==='function'){openChapters(event);}else{document.getElementById('chapterDrawer').classList.add('active');document.getElementById('chapterDrawer').style.cssText='position:fixed;top:0;left:0px!important;width:380px;max-width:100vw;height:100vh;background:var(--bg-drawer);z-index:999999!important;padding:3rem 2rem;display:block!important;';document.getElementById('settingsOverlay').classList.add('active');document.getElementById('settingsOverlay').style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999998!important;opacity:1!important;pointer-events:all!important;';}">Chapters</button>
+        <button class="header-button settings-trigger" id="settingsButton" onclick="if(typeof openSettings==='function'){openSettings(event);}else{document.getElementById('settingsPanel').classList.add('active');document.getElementById('settingsPanel').style.cssText='position:fixed;top:0;right:0px!important;width:380px;max-width:100vw;height:100vh;background:var(--bg-drawer);z-index:999999!important;padding:3rem 2rem;display:block!important;';document.getElementById('settingsOverlay').classList.add('active');document.getElementById('settingsOverlay').style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999998!important;opacity:1!important;pointer-events:all!important;';}">Settings</button>
+    </div>
+</header>
+
+<main class="full-width-container">
+    <!-- HERO SECTION WITH VISUAL NOVEL COVER & DYNAMIC RESUME BUTTON -->
+    <section class="home-hero" id="home">
+        <div class="hero-bg-glow"></div>
+        <div class="hero-grid-container" style="display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 3rem; align-items: center; width: 100%; max-width: 1200px; text-align: left; margin: 0 auto;">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="pulse-dot"></span> AN URDU NOVEL BY Nimra Ahmed
+                </div>
+
+                <h1> <em>Namal</em></h1>
+
+                <div class="hero-divider" style="margin: 0 0 2rem 0;"></div>
+
+                <p class="hero-urdu" style="text-align: right; direction: rtl; margin-bottom: 1.5rem;">
+راز کھلتے گئے، پردے ہٹتے گئے، حق کی تلاش میں راستے ملتے گئے۔ جو آزمائش میں بھی سچ کا ساتھ دے، وہی آخرکار تقدیر سے جیتے گئے۔                </p>
+
+                <p class="hero-description" style="margin: 0 0 2.5rem 0;">
+                    A gripping literary journey through mystery, justice, faith, betrayal, and redemption — where hidden truths unfold, destinies collide, and every choice leads closer to the truth.
+                </p>
+
+                <div class="hero-buttons" style="justify-content: flex-start; margin-bottom: 2rem;">
+                    <a href="chapter1.html" class="primary-button" id="mainReadBtn">
+                        Begin Reading <span class="arrow">→</span>
+                    </a>
+                    <button class="secondary-button" id="exploreIndexBtn" onclick="openChapters(event)">
+                        Explore Index (174 Chapters)
+                    </button>
+                </div>
+
+                <!-- Dynamic Last Read Resume Bar -->
+                <div class="resume-reading-bar" id="resumeBar" style="display: none; margin-bottom: 2rem;">
+                    <span>🔖 Continue from where you left:</span>
+                    <a href="chapter1.html" id="resumeLink">Chapter 01 — Ek Khwaab</a>
+                </div>
+
+                <div class="hero-meta" style="justify-content: flex-start; gap: 3rem; margin: 0; padding-top: 1.8rem;">
+                    <div class="meta-item">
+                        <small>AUTHOR</small>
+                        <strong>Nimra Ahmed</strong>
+                    </div>
+                    <div class="meta-item">
+                        <small>PUBLISHED</small>
+                        <strong>2017</strong>
+                    </div>
+                    <div class="meta-item">
+                        <small>STATUS</small>
+                        <strong>Complete (174 Chapters)</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3D Visual Book Cover Showcase -->
+            <div class="hero-visual-card">
+                <img src="Namal.jpg" alt="Namal Novel Cover" style="width: 100%; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px var(--accent-glow); transform: perspective(1000px) rotateY(-6deg); transition: transform 0.5s ease;">
+            </div>
+        </div>
+    </section>
+
+    <!-- SYNOPSIS & PROGRESS TRACKER -->
+    <section class="content-section" id="about">
+        <div class="section-heading">
+            <span>The Core Story</span>
+            <h2>Beneath The Veil Of Silence</h2>
+        </div>
+
+        <div class="synopsis-grid">
+            <div class="synopsis-badge">01</div>
+            <div class="synopsis-text">
+                <p>Namal is a sprawling Urdu novel that brings together crime, mystery, justice, family conflict, betrayal, faith, revenge, and redemption into one interconnected narrative.</p>
+
+
+<p>At the heart of the story lies a complicated web of relationships and hidden truths. What initially appears to be a straightforward case gradually unfolds into something far more intricate, revealing secrets buried within families, friendships, and personal histories. Every character carries a past, and every decision has consequences that eventually come back to shape the larger story.</p>
+
+
+
+<p>One of the novel's strongest elements is its treatment of truth and deception. Characters are forced to question what they see, whom they trust, and whether the evidence before them represents the complete truth. As the story progresses, seemingly unrelated events begin to connect, creating a larger picture in which personal motives and hidden agendas become increasingly important.</p>
+
+                <p>Namal also explores the idea of justice beyond the courtroom. Justice is not presented merely as punishment or legal victory; it becomes a question of truth, responsibility, forgiveness, and consequences. Characters are repeatedly placed in situations where they must decide between personal interests and what they believe to be right.</p>
+                </div>
+        </div>
+
+        <!-- Novel Progress Bar -->
+        <div class="progress-box">
+            <div class="progress-info">
+                <span>Novel Completion Status</span>
+                <strong>100% Complete (All 93 Chapters Available)</strong>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 100%;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT THE AUTHOR SECTION -->
+    <section class="content-section" id="author">
+        <div class="section-heading">
+            <span>The Mind Behind The Novel</span>
+            <h2>About The Author</h2>
+        </div>
+
+        <div class="author-card-wrapper">
+            <div class="author-card">
+                <div class="author-badge">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                </div>
+
+                <div class="author-info">
+                    <h3>Nimra Ahmed
+</h3>
+                    <span class="author-tagline">Writer & Storyteller</span>
+
+                    <div class="author-bio"><p>
+
+Nimra Ahmed is a renowned Pakistani Urdu novelist known for creating stories that blend mystery, suspense, romance, spirituality, and complex human emotions. Her writing often goes beyond conventional storytelling, exploring the inner conflicts of her characters and the choices that shape their lives. Rather than presenting simple heroes and villains, she creates layered personalities with their own weaknesses, ambitions, fears, beliefs, and moral struggles.</p>
+
+
+
+<p>Her novels frequently combine compelling narratives with deeper questions about faith, identity, morality, destiny, and human relationships. This distinctive combination has made her work particularly memorable among Urdu fiction readers. Her notable works include Mushaf, Jannat Kay Pattay, Namal, and Haalim, each offering a different world of characters, conflicts, mysteries, and emotional journeys.</p>
+
+                <p>
+What makes Nimra Ahmed's storytelling distinctive is the way she connects entertainment with reflection. A mystery may lead to a question of morality, a relationship may reveal a character's deepest weakness, and a difficult situation may become the beginning of spiritual transformation. Her stories invite readers not only to discover what happens next, but also to think about why her characters make the choices they do.</p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CHARACTERS & INTERACTIVE MAP -->
+    <section class="content-section" id="characters">
+        <div class="section-heading">
+            <span>Protagonists & Dynamics</span>
+            <h2>Characters & Souls</h2>
+        </div>
+
+        <div class="character-grid">
+            <article class="character-card">
+                <div class="character-card-header">
+                    <div class="character-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <span class="character-number">01</span>
+                </div>
+                <h3>Faris Ghazi</h3>
+                <p>Faris Ghazi is one of the central figures of Namal. Intelligent, composed, and strategically minded, he is placed at the center of a devastating situation that changes the course of his life.</p>
+<p>His character carries a strong sense of complexity. He is not simply defined by the circumstances surrounding him; his personality, decisions, suffering, and resilience gradually reveal different layers of who he is.</p>
+
+
+            </article>
+
+            <article class="character-card">
+                <div class="character-card-header">
+                    <div class="character-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 1-3-3.87"></path><path d="M4 21v-2a4 4 0 0 1 3-3.87"></path><circle cx="12" cy="7" r="4"></circle><path d="M12 11v10"></path></svg>
+                    </div>
+                    <span class="character-number">02</span>
+                </div>
+                <h3>Zumar Yousuf</h3>
+                <p>Zumar Yousuf is the principal female character of Namal, known for her intelligence, determination, and strong sense of justice. Her connection to Faris and the events surrounding his case places her at the heart of the novel's central conflict. She constantly finds herself balancing reason with emotion while trying to understand the truth behind complicated circumstances. Zumar represents courage, intelligence, loyalty, and the strength to stand by what she believes is right.</p>
+            </article>
+        </div>
+
+        <!-- Character Relationship Map -->
+        <div class="rel-map-wrapper">
+            <h3>Character Relationship Web</h3>
+            <div class="rel-map">
+                <div class="rel-node">Faris Ghazi</div>
+                <div class="rel-line">
+                    <span>trust, justice, and emotional understanding</span>
+                </div>
+                <div class="rel-node">Zumar Yousuf
+</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MOODBOARD & VISUAL GALLERY -->
+    <section class="content-section" id="gallery">
+        <div class="section-heading">
+            <span>VISUAL ATMOSPHERE</span>
+            <h2>Aesthetic Moodboard</h2>
+        </div>
+
+        <div class="moodboard-grid">
+            <div class="mood-card m-1">
+                <div class="mood-card-content">
+                   <span class="mood-title">The Hidden Truth</span>
+<span class="mood-sub">Secrets & Justice</span>
+                </div>
+            </div>
+            <div class="mood-card m-2">
+                <div class="mood-card-content"><span class="mood-title">The Silent Shadows</span>
+<span class="mood-sub">Mystery & Deception</span>
+                </div>
+            </div>
+            <div class="mood-card m-3">
+                <div class="mood-card-content"><span class="mood-title">The Final Light</span>
+<span class="mood-sub">Faith & Redemption</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- QUOTES WITH ONE-CLICK SHARE -->
+    <section class="content-section" id="quotes">
+        <div class="section-heading">
+            <span>Poetic Expressions</span>
+            <h2>Quotes & Shareable Shayari</h2>
+        </div>
+<div class="quotes-grid">
+    <blockquote class="quote-card">
+        <p>کچھ جنگیں دنیا سے نہیں، انسان کو اپنے اندر لڑنی پڑتی ہیں؛ اور فتح تب ہوتی ہے جب انسان خود کو پہچان لیتا ہے۔</p>
+        <button class="share-btn" onclick="shareQuote('کچھ جنگیں دنیا سے نہیں، انسان کو اپنے اندر لڑنی پڑتی ہیں؛ اور فتح تب ہوتی ہے جب انسان خود کو پہچان لیتا ہے۔')">Share on WhatsApp 💬</button>
+    </blockquote>
+
+    <blockquote class="quote-card">
+        <p>نمل ہمیں سکھاتا ہے کہ سچ کی راہ مشکل ضرور ہوتی ہے، مگر آخرکار وہی دل کو سکون دیتی ہے۔</p>
+        <button class="share-btn" onclick="shareQuote('نمل ہمیں سکھاتا ہے کہ سچ کی راہ مشکل ضرور ہوتی ہے، مگر آخرکار وہی دل کو سکون دیتی ہے۔')">Share on WhatsApp 💬</button>
+    </blockquote>
+</div>
+
+
+
+    <!-- READER REVIEWS CAROUSEL -->
+    <section class="content-section">
+        <div class="section-heading">
+            <span>Reader Appreciations</span>
+            <h2>What Readers Say</h2>
+        </div>
+
+        <div class="reviews-carousel">
+            <div class="review-card active">
+                <div class="stars">★★★★★</div>
+                <p>“Namal is not just a story; it is a journey through faith, justice, betrayal, and redemption.”</p>
+                <strong>— Saniya Mehak.</strong>
+            </div>
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>“Every character carries a different shade of truth, making Namal impossible to forget.”</p>
+                <strong>— Kaynat K.</strong>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMUNITY POLL & DISCUSSION -->
+    <section class="content-section" id="community">
+        <div class="section-heading">
+            <span>Interactive Space</span>
+            <h2>Community Poll & Discussion</h2>
+        </div>
+
+        <!-- Reader Poll -->
+        <div class="poll-wrapper">
+            <h3>Weekly Question: What defines character best?</h3>
+            <div class="poll-options">
+                <button class="poll-btn" onclick="vote(this, 'Silence & Patience (Sabr)')">Silence & Patience (Sabr)</button>
+                <button class="poll-btn" onclick="vote(this, 'Words & Expression')">Words & Expression</button>
+                <button class="poll-btn" onclick="vote(this, 'Boundaries & Dignity (Haya)')">Boundaries & Dignity (Haya)</button>
+            </div>
+            <small id="pollResult" class="poll-result-text"></small>
+        </div>
+
+        <!-- Comment Box -->
+        <div class="comment-box-wrapper" style="margin-top: 3rem;">
+            <form id="commentForm" class="comment-form" onsubmit="return handleCommentSubmit(event)">
+                <div class="form-row">
+                    <input type="text" id="reviewerName" name="name" placeholder="Your Name" required>
+                    <input type="email" id="reviewerEmail" name="email" placeholder="Your Email (Optional)">
+                </div>
+                <textarea id="reviewerMessage" name="message" rows="4" placeholder="Share your thoughts or feedback about the novel..." required></textarea>
+                <button type="button" onclick="handleCommentSubmit(event)" class="primary-button submit-btn">Post Comment</button>
+            </form>
+
+            <div class="comments-list" id="commentsList">
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <strong>Aamina.</strong>
+                    </div>
+                    <p>A story that changed the way I look at faith, purpose, and life.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-title">Namal</div>
+        <p>Written by Nimra Ahmed · 2017 · All Rights Reserved</p>
+    </footer>
+</main>
+
+<!-- CHAPTER DRAWER -->
+<aside class="chapter-drawer" id="chapterDrawer">
+    <div class="drawer-header">
+        <h3>Chapters Index</h3>
+        <button id="closeChapters" onclick="closeAllDrawers()">&times;</button>
+    </div>
+
+
+
+   <div class="drawer-content">
+    <a href="chapter1.html" class="chapter-link"><span>01</span> <div><strong>Chapter 01</strong></div></a>
+    <a href="chapter2.html" class="chapter-link"><span>02</span> <div><strong>Chapter 02</strong></div></a>
+    <a href="chapter3.html" class="chapter-link"><span>03</span> <div><strong>Chapter 03</strong></div></a>
+    <a href="chapter4.html" class="chapter-link"><span>04</span> <div><strong>Chapter 04</strong></div></a>
+    <a href="chapter5.html" class="chapter-link"><span>05</span> <div><strong>Chapter 05</strong></div></a>
+    <a href="chapter6.html" class="chapter-link"><span>06</span> <div><strong>Chapter 06</strong></div></a>
+    <a href="chapter7.html" class="chapter-link"><span>07</span> <div><strong>Chapter 07</strong></div></a>
+    <a href="chapter8.html" class="chapter-link"><span>08</span> <div><strong>Chapter 08</strong></div></a>
+    <a href="chapter9.html" class="chapter-link"><span>09</span> <div><strong>Chapter 09</strong></div></a>
+    <a href="chapter10.html" class="chapter-link"><span>10</span> <div><strong>Chapter 10</strong></div></a>
+    <a href="chapter11.html" class="chapter-link"><span>11</span> <div><strong>Chapter 11</strong></div></a>
+    <a href="chapter12.html" class="chapter-link"><span>12</span> <div><strong>Chapter 12</strong></div></a>
+    <a href="chapter13.html" class="chapter-link"><span>13</span> <div><strong>Chapter 13</strong></div></a>
+    <a href="chapter14.html" class="chapter-link"><span>14</span> <div><strong>Chapter 14</strong></div></a>
+    <a href="chapter15.html" class="chapter-link"><span>15</span> <div><strong>Chapter 15</strong></div></a>
+    <a href="chapter16.html" class="chapter-link"><span>16</span> <div><strong>Chapter 16</strong></div></a>
+    <a href="chapter17.html" class="chapter-link"><span>17</span> <div><strong>Chapter 17</strong></div></a>
+    <a href="chapter18.html" class="chapter-link"><span>18</span> <div><strong>Chapter 18</strong></div></a>
+    <a href="chapter19.html" class="chapter-link"><span>19</span> <div><strong>Chapter 19</strong></div></a>
+    <a href="chapter20.html" class="chapter-link"><span>20</span> <div><strong>Chapter 20</strong></div></a>
+    <a href="chapter21.html" class="chapter-link"><span>21</span> <div><strong>Chapter 21</strong></div></a>
+    <a href="chapter22.html" class="chapter-link"><span>22</span> <div><strong>Chapter 22</strong></div></a>
+    <a href="chapter23.html" class="chapter-link"><span>23</span> <div><strong>Chapter 23</strong></div></a>
+    <a href="chapter24.html" class="chapter-link"><span>24</span> <div><strong>Chapter 24</strong></div></a>
+    <a href="chapter25.html" class="chapter-link"><span>25</span> <div><strong>Chapter 25</strong></div></a>
+    <a href="chapter26.html" class="chapter-link"><span>26</span> <div><strong>Chapter 26</strong></div></a>
+    <a href="chapter27.html" class="chapter-link"><span>27</span> <div><strong>Chapter 27</strong></div></a>
+    <a href="chapter28.html" class="chapter-link"><span>28</span> <div><strong>Chapter 28</strong></div></a>
+    <a href="chapter29.html" class="chapter-link"><span>29</span> <div><strong>Chapter 29</strong></div></a>
+    <a href="chapter30.html" class="chapter-link"><span>30</span> <div><strong>Chapter 30</strong></div></a>
+    <a href="chapter31.html" class="chapter-link"><span>31</span> <div><strong>Chapter 31</strong></div></a>
+    <a href="chapter32.html" class="chapter-link"><span>32</span> <div><strong>Chapter 32</strong></div></a>
+    <a href="chapter33.html" class="chapter-link"><span>33</span> <div><strong>Chapter 33</strong></div></a>
+    <a href="chapter34.html" class="chapter-link"><span>34</span> <div><strong>Chapter 34</strong></div></a>
+    <a href="chapter35.html" class="chapter-link"><span>35</span> <div><strong>Chapter 35</strong></div></a>
+    <a href="chapter36.html" class="chapter-link"><span>36</span> <div><strong>Chapter 36</strong></div></a>
+    <a href="chapter37.html" class="chapter-link"><span>37</span> <div><strong>Chapter 37</strong></div></a>
+    <a href="chapter38.html" class="chapter-link"><span>38</span> <div><strong>Chapter 38</strong></div></a>
+    <a href="chapter39.html" class="chapter-link"><span>39</span> <div><strong>Chapter 39</strong></div></a>
+    <a href="chapter40.html" class="chapter-link"><span>40</span> <div><strong>Chapter 40</strong></div></a>
+    <a href="chapter41.html" class="chapter-link"><span>41</span> <div><strong>Chapter 41</strong></div></a>
+    <a href="chapter42.html" class="chapter-link"><span>42</span> <div><strong>Chapter 42</strong></div></a>
+    <a href="chapter43.html" class="chapter-link"><span>43</span> <div><strong>Chapter 43</strong></div></a>
+    <a href="chapter44.html" class="chapter-link"><span>44</span> <div><strong>Chapter 44</strong></div></a>
+    <a href="chapter45.html" class="chapter-link"><span>45</span> <div><strong>Chapter 45</strong></div></a>
+    <a href="chapter46.html" class="chapter-link"><span>46</span> <div><strong>Chapter 46</strong></div></a>
+    <a href="chapter47.html" class="chapter-link"><span>47</span> <div><strong>Chapter 47</strong></div></a>
+    <a href="chapter48.html" class="chapter-link"><span>48</span> <div><strong>Chapter 48</strong></div></a>
+    <a href="chapter49.html" class="chapter-link"><span>49</span> <div><strong>Chapter 49</strong></div></a>
+    <a href="chapter50.html" class="chapter-link"><span>50</span> <div><strong>Chapter 50</strong></div></a>
+    <a href="chapter51.html" class="chapter-link"><span>51</span> <div><strong>Chapter 51</strong></div></a>
+    <a href="chapter52.html" class="chapter-link"><span>52</span> <div><strong>Chapter 52</strong></div></a>
+    <a href="chapter53.html" class="chapter-link"><span>53</span> <div><strong>Chapter 53</strong></div></a>
+    <a href="chapter54.html" class="chapter-link"><span>54</span> <div><strong>Chapter 54</strong></div></a>
+    <a href="chapter55.html" class="chapter-link"><span>55</span> <div><strong>Chapter 55</strong></div></a>
+    <a href="chapter56.html" class="chapter-link"><span>56</span> <div><strong>Chapter 56</strong></div></a>
+    <a href="chapter57.html" class="chapter-link"><span>57</span> <div><strong>Chapter 57</strong></div></a>
+    <a href="chapter58.html" class="chapter-link"><span>58</span> <div><strong>Chapter 58</strong></div></a>
+    <a href="chapter59.html" class="chapter-link"><span>59</span> <div><strong>Chapter 59</strong></div></a>
+    <a href="chapter60.html" class="chapter-link"><span>60</span> <div><strong>Chapter 60</strong></div></a>
+    <a href="chapter61.html" class="chapter-link"><span>61</span> <div><strong>Chapter 61</strong></div></a>
+    <a href="chapter62.html" class="chapter-link"><span>62</span> <div><strong>Chapter 62</strong></div></a>
+    <a href="chapter63.html" class="chapter-link"><span>63</span> <div><strong>Chapter 63</strong></div></a>
+    <a href="chapter64.html" class="chapter-link"><span>64</span> <div><strong>Chapter 64</strong></div></a>
+    <a href="chapter65.html" class="chapter-link"><span>65</span> <div><strong>Chapter 65</strong></div></a>
+    <a href="chapter66.html" class="chapter-link"><span>66</span> <div><strong>Chapter 66</strong></div></a>
+    <a href="chapter67.html" class="chapter-link"><span>67</span> <div><strong>Chapter 67</strong></div></a>
+    <a href="chapter68.html" class="chapter-link"><span>68</span> <div><strong>Chapter 68</strong></div></a>
+    <a href="chapter69.html" class="chapter-link"><span>69</span> <div><strong>Chapter 69</strong></div></a>
+    <a href="chapter70.html" class="chapter-link"><span>70</span> <div><strong>Chapter 70</strong></div></a>
+    <a href="chapter71.html" class="chapter-link"><span>71</span> <div><strong>Chapter 71</strong></div></a>
+    <a href="chapter72.html" class="chapter-link"><span>72</span> <div><strong>Chapter 72</strong></div></a>
+    <a href="chapter73.html" class="chapter-link"><span>73</span> <div><strong>Chapter 73</strong></div></a>
+    <a href="chapter74.html" class="chapter-link"><span>74</span> <div><strong>Chapter 74</strong></div></a>
+    <a href="chapter75.html" class="chapter-link"><span>75</span> <div><strong>Chapter 75</strong></div></a>
+    <a href="chapter76.html" class="chapter-link"><span>76</span> <div><strong>Chapter 76</strong></div></a>
+    <a href="chapter77.html" class="chapter-link"><span>77</span> <div><strong>Chapter 77</strong></div></a>
+    <a href="chapter78.html" class="chapter-link"><span>78</span> <div><strong>Chapter 78</strong></div></a>
+    <a href="chapter79.html" class="chapter-link"><span>79</span> <div><strong>Chapter 79</strong></div></a>
+    <a href="chapter80.html" class="chapter-link"><span>80</span> <div><strong>Chapter 80</strong></div></a>
+    <a href="chapter81.html" class="chapter-link"><span>81</span> <div><strong>Chapter 81</strong></div></a>
+    <a href="chapter82.html" class="chapter-link"><span>82</span> <div><strong>Chapter 82</strong></div></a>
+    <a href="chapter83.html" class="chapter-link"><span>83</span> <div><strong>Chapter 83</strong></div></a>
+    <a href="chapter84.html" class="chapter-link"><span>84</span> <div><strong>Chapter 84</strong></div></a>
+    <a href="chapter85.html" class="chapter-link"><span>85</span> <div><strong>Chapter 85</strong></div></a>
+    <a href="chapter86.html" class="chapter-link"><span>86</span> <div><strong>Chapter 86</strong></div></a>
+    <a href="chapter87.html" class="chapter-link"><span>87</span> <div><strong>Chapter 87</strong></div></a>
+    <a href="chapter88.html" class="chapter-link"><span>88</span> <div><strong>Chapter 88</strong></div></a>
+    <a href="chapter89.html" class="chapter-link"><span>89</span> <div><strong>Chapter 89</strong></div></a>
+    <a href="chapter90.html" class="chapter-link"><span>90</span> <div><strong>Chapter 90</strong></div></a>
+    <a href="chapter91.html" class="chapter-link"><span>91</span> <div><strong>Chapter 91</strong></div></a>
+    <a href="chapter92.html" class="chapter-link"><span>92</span> <div><strong>Chapter 92</strong></div></a>
+    <a href="chapter93.html" class="chapter-link"><span>93</span> <div><strong>Chapter 93</strong></div></a>
+    <a href="chapter94.html" class="chapter-link"><span>94</span> <div><strong>Chapter 94</strong></div></a>
+    <a href="chapter95.html" class="chapter-link"><span>95</span> <div><strong>Chapter 95</strong></div></a>
+    <a href="chapter96.html" class="chapter-link"><span>96</span> <div><strong>Chapter 96</strong></div></a>
+    <a href="chapter97.html" class="chapter-link"><span>97</span> <div><strong>Chapter 97</strong></div></a>
+    <a href="chapter98.html" class="chapter-link"><span>98</span> <div><strong>Chapter 98</strong></div></a>
+    <a href="chapter99.html" class="chapter-link"><span>99</span> <div><strong>Chapter 99</strong></div></a>
+    <a href="chapter100.html" class="chapter-link"><span>100</span> <div><strong>Chapter 100</strong></div></a>
+    <a href="chapter101.html" class="chapter-link"><span>101</span> <div><strong>Chapter 101</strong></div></a>
+    <a href="chapter102.html" class="chapter-link"><span>102</span> <div><strong>Chapter 102</strong></div></a>
+    <a href="chapter103.html" class="chapter-link"><span>103</span> <div><strong>Chapter 103</strong></div></a>
+    <a href="chapter104.html" class="chapter-link"><span>104</span> <div><strong>Chapter 104</strong></div></a>
+    <a href="chapter105.html" class="chapter-link"><span>105</span> <div><strong>Chapter 105</strong></div></a>
+    <a href="chapter106.html" class="chapter-link"><span>106</span> <div><strong>Chapter 106</strong></div></a>
+    <a href="chapter107.html" class="chapter-link"><span>107</span> <div><strong>Chapter 107</strong></div></a>
+    <a href="chapter108.html" class="chapter-link"><span>108</span> <div><strong>Chapter 108</strong></div></a>
+    <a href="chapter109.html" class="chapter-link"><span>109</span> <div><strong>Chapter 109</strong></div></a>
+    <a href="chapter110.html" class="chapter-link"><span>110</span> <div><strong>Chapter 110</strong></div></a>
+    <a href="chapter111.html" class="chapter-link"><span>111</span> <div><strong>Chapter 111</strong></div></a>
+    <a href="chapter112.html" class="chapter-link"><span>112</span> <div><strong>Chapter 112</strong></div></a>
+    <a href="chapter113.html" class="chapter-link"><span>113</span> <div><strong>Chapter 113</strong></div></a>
+    <a href="chapter114.html" class="chapter-link"><span>114</span> <div><strong>Chapter 114</strong></div></a>
+    <a href="chapter115.html" class="chapter-link"><span>115</span> <div><strong>Chapter 115</strong></div></a>
+    <a href="chapter116.html" class="chapter-link"><span>116</span> <div><strong>Chapter 116</strong></div></a>
+    <a href="chapter117.html" class="chapter-link"><span>117</span> <div><strong>Chapter 117</strong></div></a>
+    <a href="chapter118.html" class="chapter-link"><span>118</span> <div><strong>Chapter 118</strong></div></a>
+    <a href="chapter119.html" class="chapter-link"><span>119</span> <div><strong>Chapter 119</strong></div></a>
+    <a href="chapter120.html" class="chapter-link"><span>120</span> <div><strong>Chapter 120</strong></div></a>
+    <a href="chapter121.html" class="chapter-link"><span>121</span> <div><strong>Chapter 121</strong></div></a>
+    <a href="chapter122.html" class="chapter-link"><span>122</span> <div><strong>Chapter 122</strong></div></a>
+    <a href="chapter123.html" class="chapter-link"><span>123</span> <div><strong>Chapter 123</strong></div></a>
+    <a href="chapter124.html" class="chapter-link"><span>124</span> <div><strong>Chapter 124</strong></div></a>
+    <a href="chapter125.html" class="chapter-link"><span>125</span> <div><strong>Chapter 125</strong></div></a>
+    <a href="chapter126.html" class="chapter-link"><span>126</span> <div><strong>Chapter 126</strong></div></a>
+    <a href="chapter127.html" class="chapter-link"><span>127</span> <div><strong>Chapter 127</strong></div></a>
+    <a href="chapter128.html" class="chapter-link"><span>128</span> <div><strong>Chapter 128</strong></div></a>
+    <a href="chapter129.html" class="chapter-link"><span>129</span> <div><strong>Chapter 129</strong></div></a>
+    <a href="chapter130.html" class="chapter-link"><span>130</span> <div><strong>Chapter 130</strong></div></a>
+    <a href="chapter131.html" class="chapter-link"><span>131</span> <div><strong>Chapter 131</strong></div></a>
+    <a href="chapter132.html" class="chapter-link"><span>132</span> <div><strong>Chapter 132</strong></div></a>
+    <a href="chapter133.html" class="chapter-link"><span>133</span> <div><strong>Chapter 133</strong></div></a>
+    <a href="chapter134.html" class="chapter-link"><span>134</span> <div><strong>Chapter 134</strong></div></a>
+    <a href="chapter135.html" class="chapter-link"><span>135</span> <div><strong>Chapter 135</strong></div></a>
+    <a href="chapter136.html" class="chapter-link"><span>136</span> <div><strong>Chapter 136</strong></div></a>
+    <a href="chapter137.html" class="chapter-link"><span>137</span> <div><strong>Chapter 137</strong></div></a>
+    <a href="chapter138.html" class="chapter-link"><span>138</span> <div><strong>Chapter 138</strong></div></a>
+    <a href="chapter139.html" class="chapter-link"><span>139</span> <div><strong>Chapter 139</strong></div></a>
+    <a href="chapter140.html" class="chapter-link"><span>140</span> <div><strong>Chapter 140</strong></div></a>
+    <a href="chapter141.html" class="chapter-link"><span>141</span> <div><strong>Chapter 141</strong></div></a>
+    <a href="chapter142.html" class="chapter-link"><span>142</span> <div><strong>Chapter 142</strong></div></a>
+    <a href="chapter143.html" class="chapter-link"><span>143</span> <div><strong>Chapter 143</strong></div></a>
+    <a href="chapter144.html" class="chapter-link"><span>144</span> <div><strong>Chapter 144</strong></div></a>
+    <a href="chapter145.html" class="chapter-link"><span>145</span> <div><strong>Chapter 145</strong></div></a>
+    <a href="chapter146.html" class="chapter-link"><span>146</span> <div><strong>Chapter 146</strong></div></a>
+    <a href="chapter147.html" class="chapter-link"><span>147</span> <div><strong>Chapter 147</strong></div></a>
+    <a href="chapter148.html" class="chapter-link"><span>148</span> <div><strong>Chapter 148</strong></div></a>
+    <a href="chapter149.html" class="chapter-link"><span>149</span> <div><strong>Chapter 149</strong></div></a>
+    <a href="chapter150.html" class="chapter-link"><span>150</span> <div><strong>Chapter 150</strong></div></a>
+    <a href="chapter151.html" class="chapter-link"><span>151</span> <div><strong>Chapter 151</strong></div></a>
+    <a href="chapter152.html" class="chapter-link"><span>152</span> <div><strong>Chapter 152</strong></div></a>
+    <a href="chapter153.html" class="chapter-link"><span>153</span> <div><strong>Chapter 153</strong></div></a>
+    <a href="chapter154.html" class="chapter-link"><span>154</span> <div><strong>Chapter 154</strong></div></a>
+    <a href="chapter155.html" class="chapter-link"><span>155</span> <div><strong>Chapter 155</strong></div></a>
+    <a href="chapter156.html" class="chapter-link"><span>156</span> <div><strong>Chapter 156</strong></div></a>
+    <a href="chapter157.html" class="chapter-link"><span>157</span> <div><strong>Chapter 157</strong></div></a>
+    <a href="chapter158.html" class="chapter-link"><span>158</span> <div><strong>Chapter 158</strong></div></a>
+    <a href="chapter159.html" class="chapter-link"><span>159</span> <div><strong>Chapter 159</strong></div></a>
+    <a href="chapter160.html" class="chapter-link"><span>160</span> <div><strong>Chapter 160</strong></div></a>
+    <a href="chapter161.html" class="chapter-link"><span>161</span> <div><strong>Chapter 161</strong></div></a>
+    <a href="chapter162.html" class="chapter-link"><span>162</span> <div><strong>Chapter 162</strong></div></a>
+    <a href="chapter163.html" class="chapter-link"><span>163</span> <div><strong>Chapter 163</strong></div></a>
+    <a href="chapter164.html" class="chapter-link"><span>164</span> <div><strong>Chapter 164</strong></div></a>
+    <a href="chapter165.html" class="chapter-link"><span>165</span> <div><strong>Chapter 165</strong></div></a>
+    <a href="chapter166.html" class="chapter-link"><span>166</span> <div><strong>Chapter 166</strong></div></a>
+    <a href="chapter167.html" class="chapter-link"><span>167</span> <div><strong>Chapter 167</strong></div></a>
+    <a href="chapter168.html" class="chapter-link"><span>168</span> <div><strong>Chapter 168</strong></div></a>
+    <a href="chapter169.html" class="chapter-link"><span>169</span> <div><strong>Chapter 169</strong></div></a>
+    <a href="chapter170.html" class="chapter-link"><span>170</span> <div><strong>Chapter 170</strong></div></a>
+    <a href="chapter171.html" class="chapter-link"><span>171</span> <div><strong>Chapter 171</strong></div></a>
+    <a href="chapter172.html" class="chapter-link"><span>172</span> <div><strong>Chapter 172</strong></div></a>
+    <a href="chapter173.html" class="chapter-link"><span>173</span> <div><strong>Chapter 173</strong></div></a>
+    <a href="chapter174.html" class="chapter-link"><span>174</span> <div><strong>Chapter 174</strong></div></a>
+</div>
+                   </div>
+</aside>
+
+<!-- SETTINGS PANEL -->
+<aside class="settings-panel" id="settingsPanel">
+    <div class="settings-header">
+        <h3>Reader Customizer</h3>
+        <button id="closeSettings" onclick="closeAllDrawers()">×</button>
+    </div>
+
+    <div class="setting-group">
+        <label>Theme Style</label>
+        <div class="theme-grid">
+            <button data-theme="default">Espresso Dark</button>
+            <button data-theme="oled">OLED Black</button>
+            <button data-theme="cream">Warm Cream</button>
+            <button data-theme="midnight">Midnight Blue</button>
+            <button data-theme="emerald">Rich Emerald</button>
+        </div>
+    </div>
+
+    <div class="setting-group">
+        <label>Typography</label>
+        <button class="font-option" data-font="literata">Literata (Classic)</button>
+        <button class="font-option" data-font="inter">Inter (Modern Sans)</button>
+        <button class="font-option" data-font="nastaliq">Urdu Nastaliq Script</button>
+    </div>
+
+    <div class="setting-group">
+        <label>Text Scaling</label>
+        <div class="size-buttons">
+            <button data-size="small">A−</button>
+            <button data-size="medium">Default</button>
+            <button data-size="large">A+</button>
+        </div>
+    </div>
+</aside>
+
+<!-- CONTACT MODAL -->
+<div class="contact-modal" id="contactModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Get In Touch</h3>
+            <button id="closeContact" onclick="closeAllDrawers()">×</button>
+        </div>
+        <form id="contactForm">
+            <input type="hidden" name="access_key" value="78b08615-65ca-4c89-a320-b21b236bba26">
+            <input type="text" id="contactName" name="name" placeholder="Your Name" required>
+            <input type="email" id="contactEmail" name="email" placeholder="Your Email" required>
+            <textarea id="contactMessage" name="message" rows="4" placeholder="Your Message or Query..." required></textarea>
+            <button type="submit" class="primary-button" style="width: 100%;">Send Message</button>
+        </form>
+    </div>
+</div>
+
+<div class="settings-overlay" id="settingsOverlay" onclick="closeAllDrawers()"></div>
+
+<script src="Namal.js?v=9.0"></script>
+</body>
+</html>
